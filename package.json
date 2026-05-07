@@ -1,0 +1,19 @@
+{
+  "name": "motor-inferencia-logica",
+  "version": "1.0.0",
+  "description": "Motor de inferencia logica",
+  "license": "ISC",
+  "author": "Juan Canche",
+  "type": "commonjs",
+  "main": "server.js",
+  "scripts": {
+    "dev": "nodemon server.js"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  },
+  "dependencies": {
+    "express": "^5.2.1",
+    "tau-prolog": "^0.3.4"
+  }
+}
