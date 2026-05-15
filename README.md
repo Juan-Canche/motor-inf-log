@@ -56,6 +56,8 @@ Entrar al directorio:
 cd motor-inferencia-logica
 ```
 
+**Consideracion para el comando ```npm```**: Si usar el comando en la terminal (PowerShell) regresa un error, usar ```npm.cmd``` en su lugar para los comandos que usan ```npm```.
+
 Instalar dependencias:
 
 ```bash
@@ -79,12 +81,6 @@ npm install --save-dev nodemon
 
 ```bash
 npm start
-```
-
-Si PowerShell bloquea `npm` con un error de scripts deshabilitados, usa:
-
-```powershell
-npm.cmd start
 ```
 
 2. Si se prefiere desarrollo con reinicio automático, usa:
@@ -272,7 +268,7 @@ La API puede probarse utilizando:
 
 # Ejemplo usando PowerShell
 
-Una vez inicializado el servidor, seguir estos 2 pasos:
+Una vez inicializado el servidor, usar los siguientes 2 comandos:
 
 1. Construir el cuerpo JSON:
 
