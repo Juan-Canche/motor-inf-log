@@ -1,91 +1,68 @@
 const express = require('express');
 const pl = require('tau-prolog');
 require('tau-prolog/modules/lists')(pl);
-
 const fs = require('fs');
 
 const app = express();
-
 app.use(express.json());
 
 const PORT = 3000;
 
-// Cargar base de conocimiento
 const knowledgeBase = fs.readFileSync('./knowledge_base.pl', 'utf8');
 
-// Endpoint
-app.post('/query', (req, res) => {
+const cargarBase = (session, kb) =>
+    new Promise((resolve, reject) => {
+        session.consult(kb, {
+            success: () => resolve(),
+            error: (err) => reject(err)
+        });
+    });
+
+const ejecutarQuery = (session, query) =>
+    new Promise((resolve, reject) => {
+        session.query(query, {
+            success: () => resolve(),
+            error: (err) => reject(err)
+        });
+    });
+
+const obtenerRespuesta = (session) =>
+    new Promise((resolve) => {
+        session.answer(answer => resolve(answer));
+    });
+
+// Endpoint con async/await
+app.post('/query', async (req, res) => {
 
     const { query } = req.body;
 
     console.log("Consulta recibida:", query);
 
-    // Verificar consulta
     if (!query) {
-        return res.status(400).json({
-            error: 'No se proporcionó una consulta'
-        });
+        return res.status(400).json({ error: 'No se proporcionó una consulta' });
     }
 
-    // Crear sesión Prolog
     const session = pl.create(1000);
 
-    // Cargar base de conocimiento
-    session.consult(knowledgeBase, {
+    try {
+        await cargarBase(session, knowledgeBase);
+        console.log("Base cargada");
 
-        success: () => {
+        await ejecutarQuery(session, query);
+        console.log("Consulta válida");
 
-            console.log("Base cargada");
+        const answer = await obtenerRespuesta(session);
+        console.log("Respuesta:", answer);
 
-            // Ejecutar consulta
-            session.query(query, {
+        res.json({ result: pl.format_answer(answer) });
 
-                success: () => {
-
-                    console.log("Consulta válida");
-
-                    // Obtener respuesta
-                    session.answer(answer => {
-
-                        console.log("Respuesta:", answer);
-
-                        res.json({
-                            result: pl.format_answer(answer)
-                        });
-
-                    });
-
-                },
-
-                error: err => {
-
-                    console.log("Error query:", err);
-
-                    res.status(500).json({
-                        error: err.toString()
-                    });
-
-                }
-
-            });
-
-        },
-
-        error: err => {
-
-            console.log("Error consult:", err);
-
-            res.status(500).json({
-                error: err.toString()
-            });
-
-        }
-
-    });
+    } catch (err) {
+        console.log("Error:", err);
+        res.status(500).json({ error: err.toString() });
+    }
 
 });
 
-// Iniciar servidor
 app.listen(PORT, () => {
     console.log(`Servidor ejecutándose en puerto ${PORT}`);
 });
