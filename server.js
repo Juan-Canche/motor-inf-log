@@ -10,6 +10,11 @@ const PORT = 3000;
 
 const knowledgeBase = fs.readFileSync('./knowledge_base.pl', 'utf8');
 
+const normalizarConsulta = (query) =>
+    String(query)
+        .trim()
+        .replace(/\s+/g, ' ');
+
 const cargarBase = (session, kb) =>
     new Promise((resolve, reject) => {
         session.consult(kb, {
@@ -35,10 +40,11 @@ const obtenerRespuesta = (session) =>
 app.post('/query', async (req, res) => {
 
     const { query } = req.body;
+    const consultaNormalizada = normalizarConsulta(query);
 
-    console.log("Consulta recibida:", query);
+    console.log("Consulta recibida:", consultaNormalizada);
 
-    if (!query) {
+    if (!consultaNormalizada) {
         return res.status(400).json({ error: 'No se proporcionó una consulta' });
     }
 
@@ -48,7 +54,7 @@ app.post('/query', async (req, res) => {
         await cargarBase(session, knowledgeBase);
         console.log("Base cargada");
 
-        await ejecutarQuery(session, query);
+        await ejecutarQuery(session, consultaNormalizada);
         console.log("Consulta válida");
 
         const answer = await obtenerRespuesta(session);
