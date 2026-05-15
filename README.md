@@ -64,7 +64,7 @@ npm install
 
 ---
 
-# Instalación manual de dependencias
+## Instalación manual de dependencias
 
 ```bash
 npm install express tau-prolog
@@ -73,25 +73,39 @@ npm install --save-dev nodemon
 
 ---
 
-# Ejecución
+## Ejecución
 
-Modo normal:
+1. Inicia el servidor:
 
 ```bash
 npm start
 ```
 
-Modo desarrollo con reinicio automático usando Nodemon:
+Si PowerShell bloquea `npm` con un error de scripts deshabilitados, usa:
+
+```powershell
+npm.cmd start
+```
+
+2. Si se prefiere desarrollo con reinicio automático, usa:
 
 ```bash
 npm run dev
 ```
 
-El servidor se ejecutará en:
+Al iniciar el servidor, la API queda disponible en:
 
 ```txt
 http://localhost:3000
 ```
+
+La consulta lógica se realiza con el endpoint:
+
+```txt
+POST /query
+```
+
+La solicitud debe enviar un cuerpo JSON con la propiedad `query` en formato Prolog. Por ejemplo, con PowerShell puedes probarlo con `Invoke-RestMethod`.
 
 ---
 
@@ -101,25 +115,19 @@ http://localhost:3000
 
 Permite enviar consultas Prolog al motor de inferencia lógica.
 
----
-
-# Ejemplo de consulta
-
-## Request
+### Request
 
 ```json
 {
-  "query": "employee(juan)."
+  "query": "penalty_applicable(contract1)."
 }
 ```
 
----
-
-## Response
+### Response
 
 ```json
 {
-  "result": "true ;"
+  "result": "true"
 }
 ```
 
@@ -258,16 +266,24 @@ La API puede probarse utilizando:
 
 - Postman
 - Thunder Client
-- curl
+- PowerShell usando Invoke-RestMethod
 
 ---
 
-# Ejemplo usando curl
+# Ejemplo usando PowerShell
 
-```bash
-curl -X POST http://localhost:3000/query \
--H "Content-Type: application/json" \
--d "{\"query\":\"employee(juan).\"}"
+Una vez inicializado el servidor, seguir estos 2 pasos:
+
+1. Construir el cuerpo JSON:
+
+```powershell
+$body = @{ query = 'employee(juan).' } | ConvertTo-Json -Compress
+```
+
+2. Enviar la consulta al endpoint:
+
+```powershell
+Invoke-RestMethod -Method Post -Uri "http://localhost:3000/query" -ContentType "application/json" -Body $body
 ```
 
 ---
@@ -331,3 +347,5 @@ Resultado:
 # Autor
 
 Juan Ángel Canché Góngora
+
+Mauricio Antonio De lázaro Lara
